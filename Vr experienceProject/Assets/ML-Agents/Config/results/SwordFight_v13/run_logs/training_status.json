@@ -1,0 +1,30 @@
+{
+    "VRCombat": {
+        "elo": 1225.918816749807,
+        "checkpoints": [
+            {
+                "steps": 146505,
+                "file_path": "results\\SwordFight_v13\\VRCombat\\VRCombat-146505.onnx",
+                "reward": null,
+                "creation_time": 1777279863.7804322,
+                "auxillary_file_paths": [
+                    "results\\SwordFight_v13\\VRCombat\\VRCombat-146505.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 146505,
+            "file_path": "results\\SwordFight_v13\\VRCombat.onnx",
+            "reward": null,
+            "creation_time": 1777279863.7804322,
+            "auxillary_file_paths": [
+                "results\\SwordFight_v13\\VRCombat\\VRCombat-146505.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "0.30.0",
+        "torch_version": "1.7.1+cu110"
+    }
+}

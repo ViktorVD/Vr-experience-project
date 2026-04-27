@@ -1,0 +1,57 @@
+{
+    "VRCombat": {
+        "checkpoints": [
+            {
+                "steps": 499996,
+                "file_path": "results\\SwordFight_v27\\VRCombat\\VRCombat-499996.onnx",
+                "reward": 5.910166424181726,
+                "creation_time": 1777286873.219137,
+                "auxillary_file_paths": [
+                    "results\\SwordFight_v27\\VRCombat\\VRCombat-499996.pt"
+                ]
+            },
+            {
+                "steps": 999997,
+                "file_path": "results\\SwordFight_v27\\VRCombat\\VRCombat-999997.onnx",
+                "reward": 25.930498242378235,
+                "creation_time": 1777287542.0858285,
+                "auxillary_file_paths": [
+                    "results\\SwordFight_v27\\VRCombat\\VRCombat-999997.pt"
+                ]
+            },
+            {
+                "steps": 1078035,
+                "file_path": "results\\SwordFight_v27\\VRCombat\\VRCombat-1078035.onnx",
+                "reward": 20.3859983086586,
+                "creation_time": 1777287756.2703292,
+                "auxillary_file_paths": [
+                    "results\\SwordFight_v27\\VRCombat\\VRCombat-1078035.pt"
+                ]
+            },
+            {
+                "steps": 1106715,
+                "file_path": "results\\SwordFight_v27\\VRCombat\\VRCombat-1106715.onnx",
+                "reward": 32.23381571607156,
+                "creation_time": 1777287881.6328294,
+                "auxillary_file_paths": [
+                    "results\\SwordFight_v27\\VRCombat\\VRCombat-1106715.pt"
+                ]
+            }
+        ],
+        "elo": 1391.5464616288716,
+        "final_checkpoint": {
+            "steps": 1106715,
+            "file_path": "results\\SwordFight_v27\\VRCombat.onnx",
+            "reward": 32.23381571607156,
+            "creation_time": 1777287881.6328294,
+            "auxillary_file_paths": [
+                "results\\SwordFight_v27\\VRCombat\\VRCombat-1106715.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "0.30.0",
+        "torch_version": "1.7.1+cu110"
+    }
+}

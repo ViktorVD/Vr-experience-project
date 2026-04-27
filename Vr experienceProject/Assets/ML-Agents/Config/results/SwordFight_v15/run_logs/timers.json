@@ -1,0 +1,47 @@
+{
+    "name": "root",
+    "metadata": {
+        "timer_format_version": "0.1.0",
+        "start_time_seconds": "1777281388",
+        "python_version": "3.9.25 (main, Nov  3 2025, 22:44:01) [MSC v.1929 64 bit (AMD64)]",
+        "command_line_arguments": "C:\\Users\\Vikto\\anaconda3\\envs\\VREXPERIENCE\\Scripts\\mlagents-learn trainer_config.yaml --run-id=SwordFight_v15",
+        "mlagents_version": "0.30.0",
+        "mlagents_envs_version": "0.30.0",
+        "communication_protocol_version": "1.5.0",
+        "pytorch_version": "1.7.1+cu110",
+        "numpy_version": "1.21.2",
+        "end_time_seconds": "1777281425"
+    },
+    "total": 37.3799722,
+    "count": 1,
+    "self": 0.010552599999996914,
+    "children": {
+        "run_training.setup": {
+            "total": 0.0862868,
+            "count": 1,
+            "self": 0.0862868
+        },
+        "TrainerController.start_learning": {
+            "total": 37.2831328,
+            "count": 1,
+            "self": 0.0003834999999980937,
+            "children": {
+                "TrainerController._reset_env": {
+                    "total": 37.282741,
+                    "count": 1,
+                    "self": 37.282741
+                },
+                "trainer_threads": {
+                    "total": 5.999999999062311e-07,
+                    "count": 1,
+                    "self": 5.999999999062311e-07
+                },
+                "TrainerController._save_models": {
+                    "total": 7.699999997612395e-06,
+                    "count": 1,
+                    "self": 7.699999997612395e-06
+                }
+            }
+        }
+    }
+}

@@ -1,6 +1,5 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody))]
 public class VRPhysicalWeapon : MonoBehaviour
 {
     public enum WeaponType { Sword, Shield, Body }
@@ -9,93 +8,80 @@ public class VRPhysicalWeapon : MonoBehaviour
     [Header("Configuratie")]
     public Transform targetTransform;
     public VRCombatAgent ownerAgent;
-    
-    [Header("Physics Settings")]
-    public float followForce = 5000f;
-    public float rotationTorque = 500f;
-    public float maxVelocity = 15f;
 
-    private Rigidbody rb;
-
-    void Start()
+    private void Start()
     {
-        rb = GetComponent<Rigidbody>();
-        rb.maxAngularVelocity = 20f;
-        // Zorg dat we niet vastlopen op onszelf
-        Physics.IgnoreCollision(GetComponent<Collider>(), ownerAgent.GetComponent<Collider>());
+        Rigidbody rb = GetComponent<Rigidbody>();
+        
+        // --- DE FIX ---
+        // Alleen zwaarden en schilden moeten Kinematic zijn (niet-fysiek volgen)
+        // Het lichaam (Body) moet ALTIJD fysiek blijven voor zwaartekracht en muren!
+        if (rb != null)
+        {
+            if (weaponType == WeaponType.Sword || weaponType == WeaponType.Shield)
+            {
+                rb.isKinematic = true;
+                rb.useGravity = false;
+                
+                // Zet wapen colliders op trigger
+                Collider[] cols = GetComponentsInChildren<Collider>();
+                foreach (var col in cols) col.isTrigger = true;
+            }
+            else if (weaponType == WeaponType.Body)
+            {
+                // Zorg dat het lichaam juist NIET kinematic is en wel gravity heeft
+                rb.isKinematic = false;
+                rb.useGravity = true;
+                
+                // Het lichaam mag GEEN trigger zijn, anders zak je door de grond!
+                Collider[] cols = GetComponentsInChildren<Collider>();
+                foreach (var col in cols) col.isTrigger = false;
+            }
+        }
     }
 
     public void ResetWeapon()
     {
-        if(rb == null) rb = GetComponent<Rigidbody>();
-        transform.position = targetTransform.position;
-        transform.rotation = targetTransform.rotation;
-        rb.linearVelocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
-    }
-
-    void FixedUpdate()
-    {
-        if (ownerAgent.isStunned) 
+        if (targetTransform != null && (weaponType == WeaponType.Sword || weaponType == WeaponType.Shield))
         {
-            // Tijdens stun verliest het wapen zijn actieve volging (slap effect)
-            rb.linearDamping = 1f;
-            rb.angularDamping = 1f;
-            return;
-        }
-
-        rb.linearDamping = 0.5f;
-        rb.angularDamping = 0.5f;
-
-        // Positie volgen via velocity (stabieler dan AddForce voor ML-Agents)
-        Vector3 positionError = targetTransform.position - transform.position;
-        rb.linearVelocity = positionError * followForce * Time.fixedDeltaTime;
-        rb.linearVelocity = Vector3.ClampMagnitude(rb.linearVelocity, maxVelocity);
-
-        // Rotatie volgen
-        Quaternion rotationError = targetTransform.rotation * Quaternion.Inverse(transform.rotation);
-        rotationError.ToAngleAxis(out float angle, out Vector3 axis);
-        if (angle > 180f) angle -= 360f;
-        
-        if (angle != 0 && !float.IsNaN(axis.x))
-        {
-            Vector3 angularGoal = (angle * axis * Mathf.Deg2Rad) / Time.fixedDeltaTime;
-            rb.angularVelocity = Vector3.Lerp(rb.angularVelocity, angularGoal, 0.5f);
+            transform.position = targetTransform.position;
+            transform.rotation = targetTransform.rotation;
         }
     }
 
-    void OnCollisionEnter(Collision collision)
+    void Update()
     {
-        VRPhysicalWeapon otherWeapon = collision.gameObject.GetComponent<VRPhysicalWeapon>();
-        
-        if (otherWeapon != null && otherWeapon.ownerAgent != this.ownerAgent)
+        // Alleen wapens volgen hun target via transform
+        if (targetTransform != null && (weaponType == WeaponType.Sword || weaponType == WeaponType.Shield))
         {
-            // 1. Zwaard raakt Body -> Damage!
-            if (this.weaponType == WeaponType.Sword && otherWeapon.weaponType == WeaponType.Body)
+            transform.position = targetTransform.position;
+            transform.rotation = targetTransform.rotation;
+        }
+    }
+
+    private void OnTriggerEnter(Collider otherCol)
+    {
+        // Zoek naar het wapen-script op het geraakte object
+        VRPhysicalWeapon other = otherCol.gameObject.GetComponentInParent<VRPhysicalWeapon>();
+        
+        if (other == null || other.ownerAgent == this.ownerAgent) return;
+
+        if (this.weaponType == WeaponType.Sword)
+        {
+            if (!ownerAgent.isAttacking) return;
+
+            if (other.weaponType == WeaponType.Shield)
             {
-                ownerAgent.RegisterHitOnOpponent(10f);
-                otherWeapon.ownerAgent.RegisterDamageReceived(10f);
+                Debug.Log("BLOCK!");
+                ownerAgent.AddReward(-0.2f);
+                other.ownerAgent.AddReward(0.3f);
+                ownerAgent.ApplyCombatStun(0.8f); 
             }
-            
-            // 2. Zwaard raakt Schild -> Block & Recoil
-            else if (this.weaponType == WeaponType.Sword && otherWeapon.weaponType == WeaponType.Shield)
+            else if (other.weaponType == WeaponType.Body)
             {
-                otherWeapon.ownerAgent.RegisterSuccessfulBlock();
-                ownerAgent.ApplyStun(0.4f); // Aanvaller krijgt recoil
-                
-                // Fysieke terugslag
-                rb.AddForce(-collision.contacts[0].normal * 15f, ForceMode.Impulse);
-            }
-            
-            // 3. Zwaard raakt Zwaard -> Clash!
-            else if (this.weaponType == WeaponType.Sword && otherWeapon.weaponType == WeaponType.Sword)
-            {
-                ownerAgent.ApplyStun(0.2f);
-                otherWeapon.ownerAgent.ApplyStun(0.2f);
-                
-                // Fysieke terugslag voor beide
-                rb.AddForce(-collision.contacts[0].normal * 8f, ForceMode.Impulse);
-                otherWeapon.GetComponent<Rigidbody>().AddForce(collision.contacts[0].normal * 8f, ForceMode.Impulse);
+                Debug.Log("HIT BODY!");
+                ownerAgent.RegisterHitOnOpponent(25f);
+                other.ownerAgent.AddReward(-0.2f);
             }
         }
     }
