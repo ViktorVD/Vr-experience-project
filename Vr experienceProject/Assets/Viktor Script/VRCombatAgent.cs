@@ -246,17 +246,20 @@ public class VRCombatAgent : Agent
             float y = (t < 0.6f) ? Mathf.Lerp(0.9f, 2.1f, t/0.6f) : Mathf.Lerp(2.1f, 0.4f, (t-0.6f)/0.4f);
             float z = (t < 0.6f) ? Mathf.Lerp(0.6f, 0.3f, t/0.6f) : Mathf.Lerp(0.3f, 2.0f, (t-0.6f)/0.4f); // Naar 2.0m
             swordTarget.localPosition = new Vector3(0.1f, y, z);
+            Debug.Log("Overhead Pos: " + swordTarget.localPosition);
         }
         else if (currentAttackType == 2) // SIDE SWING
         {
             float x = (t < 0.5f) ? Mathf.Lerp(0.5f, 1.2f, t/0.5f) : Mathf.Lerp(1.2f, -1.2f, (t-0.5f)/0.5f);
             float z = (t < 0.5f) ? Mathf.Lerp(0.6f, 0.4f, t/0.5f) : Mathf.Sin((t-0.5f) * Mathf.PI) * 1.0f + 1.0f; // Diepere boog
             swordTarget.localPosition = new Vector3(x, 1.1f, z + 0.4f); // Meer reach
+            Debug.Log("Side Swing Pos: " + swordTarget.localPosition);
         }
         else if (currentAttackType == 3) // STAB
         {
             float z = (t < 0.4f) ? Mathf.Lerp(0.6f, 0.1f, t/0.4f) : Mathf.Lerp(0.1f, 2.6f, (t-0.4f)/0.6f); // Naar 2.6m
             swordTarget.localPosition = new Vector3(0.2f, 1.0f, z);
+            Debug.Log("Stab Pos: " + swordTarget.localPosition);
         }
 
         if (t >= 1.0f)

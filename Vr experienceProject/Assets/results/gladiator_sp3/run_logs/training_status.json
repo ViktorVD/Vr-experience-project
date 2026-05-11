@@ -1,0 +1,30 @@
+{
+    "GladiatorSelfPlay": {
+        "elo": 1193.7530777389352,
+        "checkpoints": [
+            {
+                "steps": 10047,
+                "file_path": "results\\gladiator_sp3\\GladiatorSelfPlay\\GladiatorSelfPlay-10047.onnx",
+                "reward": -0.7678238276119639,
+                "creation_time": 1777279154.9219341,
+                "auxillary_file_paths": [
+                    "results\\gladiator_sp3\\GladiatorSelfPlay\\GladiatorSelfPlay-10047.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 10047,
+            "file_path": "results\\gladiator_sp3\\GladiatorSelfPlay.onnx",
+            "reward": -0.7678238276119639,
+            "creation_time": 1777279154.9219341,
+            "auxillary_file_paths": [
+                "results\\gladiator_sp3\\GladiatorSelfPlay\\GladiatorSelfPlay-10047.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "0.30.0",
+        "torch_version": "1.7.1+cu110"
+    }
+}
