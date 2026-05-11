@@ -10,7 +10,11 @@ public class VRCombatAgent : Agent
     public Transform swordTarget;
     public Transform shieldTarget;
     
-    [Header("Physics & Refs")]
+    [Header("Animaties")]
+    [Tooltip("Sleep hier de Animator van de AI in om echte animaties af te spelen")]
+    public Animator agentAnimator;
+
+    [Header("Tactics (Zwaard posities)")]
     public VRPhysicalWeapon physicalSword;
     public VRPhysicalWeapon physicalShield;
     public VRCombatAgent opponent;
@@ -159,11 +163,27 @@ public class VRCombatAgent : Agent
         else if (moveIdx == 3) moveDir = -transform.right;
         else if (moveIdx == 4) moveDir = transform.right;
 
-        if (agentRb != null && !agentRb.isKinematic) agentRb.linearVelocity = moveDir * speed;
-        else transform.position += moveDir * speed * Time.fixedDeltaTime;
+        if (agentRb != null && !agentRb.isKinematic) 
+        {
+            // Belangrijk: Behoud de Y-snelheid zodat zwaartekracht werkt en hij niet gaat zweven!
+            Vector3 newVel = moveDir * speed;
+            newVel.y = agentRb.linearVelocity.y; 
+            agentRb.linearVelocity = newVel;
+        }
+        else 
+        {
+            transform.position += moveDir * speed * Time.fixedDeltaTime;
+        }
 
         if (rotIdx == 1) transform.Rotate(Vector3.up, -140f * Time.fixedDeltaTime);
         else if (rotIdx == 2) transform.Rotate(Vector3.up, 140f * Time.fixedDeltaTime);
+
+        // --- ANIMATOR UPDATE ---
+        if (agentAnimator != null)
+        {
+            // Als moveIdx groter is dan 0, loopt hij
+            agentAnimator.SetBool("IsWalking", moveIdx > 0);
+        }
 
         // ACTIE LOGICA (Slaan of Blokkeren)
         bool canAction = !isCombatStunned && !isAttacking && globalActionCooldown <= 0;
@@ -200,6 +220,12 @@ public class VRCombatAgent : Agent
                     isAttacking = true;
                     animTimer = 0f;
                     hitRegisteredThisAttack = false;
+
+                    // Speel de zwaard-animatie af!
+                    if (agentAnimator != null)
+                    {
+                        agentAnimator.SetTrigger("Attack");
+                    }
                 }
             }
         }
