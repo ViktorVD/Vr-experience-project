@@ -15,6 +15,8 @@ public class VRCombatAgent : Agent
     public Animator agentAnimator;
 
     [Header("Tactics (Zwaard posities)")]
+    [Tooltip("Versleep dit getal om de wapens live omhoog of omlaag te schuiven!")]
+    public float weaponHeightOffset = 0.1f;
     public VRPhysicalWeapon physicalSword;
     public VRPhysicalWeapon physicalShield;
     public VRCombatAgent opponent;
@@ -41,8 +43,8 @@ public class VRCombatAgent : Agent
     // Cooldown tussen acties (Anti-spam)
     private float globalActionCooldown = 0f;
 
-    private Vector3 swordIdlePos = new Vector3(0.5f, 0.9f, 0.6f);
-    private Vector3 shieldIdlePos = new Vector3(-0.5f, 0.9f, 0.6f);
+    private Vector3 swordIdlePos = new Vector3(0.5f, 0.374f, 0.6f);
+    private Vector3 shieldIdlePos = new Vector3(-0.5f, 0.368f, 0.6f);
     private Vector3 initialPos;
     private Quaternion initialRot;
 
@@ -107,8 +109,8 @@ public class VRCombatAgent : Agent
         currentBlockDir = 0;
         animTimer = 0f;
         
-        swordTarget.localPosition = swordIdlePos;
-        shieldTarget.localPosition = shieldIdlePos;
+        swordTarget.localPosition = swordIdlePos + new Vector3(0, weaponHeightOffset, 0);
+        shieldTarget.localPosition = shieldIdlePos + new Vector3(0, weaponHeightOffset, 0);
         physicalSword.ResetWeapon();
         physicalShield.ResetWeapon();
         if(myHealth != null) myHealth.ResetHealth();
@@ -201,9 +203,9 @@ public class VRCombatAgent : Agent
             
             if (isBlocking) {
                 AddReward(-0.001f);
-                shieldTarget.localPosition = Vector3.MoveTowards(shieldTarget.localPosition, blockPos, Time.fixedDeltaTime * 15f);
+                shieldTarget.localPosition = Vector3.MoveTowards(shieldTarget.localPosition, blockPos + new Vector3(0, weaponHeightOffset, 0), Time.fixedDeltaTime * 15f);
             } else {
-                shieldTarget.localPosition = Vector3.MoveTowards(shieldTarget.localPosition, shieldIdlePos, Time.fixedDeltaTime * 20f);
+                shieldTarget.localPosition = Vector3.MoveTowards(shieldTarget.localPosition, shieldIdlePos + new Vector3(0, weaponHeightOffset, 0), Time.fixedDeltaTime * 20f);
             }
 
             // 3. AANVALLEN (Alleen als we NIET blokkeren)
@@ -235,7 +237,7 @@ public class VRCombatAgent : Agent
             if (!isAttacking) {
                 isBlocking = false;
                 currentBlockDir = 0;
-                shieldTarget.localPosition = Vector3.MoveTowards(shieldTarget.localPosition, shieldIdlePos, Time.fixedDeltaTime * 20f);
+                shieldTarget.localPosition = Vector3.MoveTowards(shieldTarget.localPosition, shieldIdlePos + new Vector3(0, weaponHeightOffset, 0), Time.fixedDeltaTime * 20f);
             }
         }
 
@@ -277,7 +279,7 @@ public class VRCombatAgent : Agent
     {
         if (!isAttacking)
         {
-            swordTarget.localPosition = Vector3.MoveTowards(swordTarget.localPosition, swordIdlePos, Time.fixedDeltaTime * 20f);
+            swordTarget.localPosition = Vector3.MoveTowards(swordTarget.localPosition, swordIdlePos + new Vector3(0, weaponHeightOffset, 0), Time.fixedDeltaTime * 20f);
             return;
         }
 
@@ -287,23 +289,20 @@ public class VRCombatAgent : Agent
 
         if (currentAttackType == 1) // OVERHEAD
         {
-            float y = (t < 0.6f) ? Mathf.Lerp(0.9f, 2.1f, t/0.6f) : Mathf.Lerp(2.1f, 0.4f, (t-0.6f)/0.4f);
-            float z = (t < 0.6f) ? Mathf.Lerp(0.6f, 0.3f, t/0.6f) : Mathf.Lerp(0.3f, 2.0f, (t-0.6f)/0.4f); // Naar 2.0m
-            swordTarget.localPosition = new Vector3(0.1f, y, z);
-            Debug.Log("Overhead Pos: " + swordTarget.localPosition);
+            float y = (t < 0.6f) ? Mathf.Lerp(swordIdlePos.y, 2.1f, t/0.6f) : Mathf.Lerp(2.1f, 0.4f, (t-0.6f)/0.4f);
+            float z = (t < 0.6f) ? Mathf.Lerp(swordIdlePos.z, 0.3f, t/0.6f) : Mathf.Lerp(0.3f, 2.0f, (t-0.6f)/0.4f); 
+            swordTarget.localPosition = new Vector3(0.1f, y + weaponHeightOffset, z);
         }
         else if (currentAttackType == 2) // SIDE SWING
         {
-            float x = (t < 0.5f) ? Mathf.Lerp(0.5f, 1.2f, t/0.5f) : Mathf.Lerp(1.2f, -1.2f, (t-0.5f)/0.5f);
-            float z = (t < 0.5f) ? Mathf.Lerp(0.6f, 0.4f, t/0.5f) : Mathf.Sin((t-0.5f) * Mathf.PI) * 1.0f + 1.0f; // Diepere boog
-            swordTarget.localPosition = new Vector3(x, 1.1f, z + 0.4f); // Meer reach
-            Debug.Log("Side Swing Pos: " + swordTarget.localPosition);
+            float x = (t < 0.5f) ? Mathf.Lerp(swordIdlePos.x, 1.2f, t/0.5f) : Mathf.Lerp(1.2f, -1.2f, (t-0.5f)/0.5f);
+            float z = (t < 0.5f) ? Mathf.Lerp(swordIdlePos.z, 0.4f, t/0.5f) : Mathf.Sin((t-0.5f) * Mathf.PI) * 1.0f + 1.0f; 
+            swordTarget.localPosition = new Vector3(x, swordIdlePos.y + 0.15f + weaponHeightOffset, z + 0.4f);
         }
         else if (currentAttackType == 3) // STAB
         {
-            float z = (t < 0.4f) ? Mathf.Lerp(0.6f, 0.1f, t/0.4f) : Mathf.Lerp(0.1f, 2.6f, (t-0.4f)/0.6f); // Naar 2.6m
-            swordTarget.localPosition = new Vector3(0.2f, 1.0f, z);
-            Debug.Log("Stab Pos: " + swordTarget.localPosition);
+            float z = (t < 0.4f) ? Mathf.Lerp(swordIdlePos.z, 0.1f, t/0.4f) : Mathf.Lerp(0.1f, 2.6f, (t-0.4f)/0.6f);
+            swordTarget.localPosition = new Vector3(swordIdlePos.x, swordIdlePos.y + weaponHeightOffset, z);
         }
 
         if (t >= 1.0f)
