@@ -46,6 +46,11 @@ public class VRPhysicalWeapon : MonoBehaviour
         {
             transform.position = targetTransform.position;
             transform.rotation = targetTransform.rotation;
+            Debug.Log($"[VRPhysicalWeapon] {gameObject.name} ResetWeapon gehaald naar: {targetTransform.name}");
+        }
+        else
+        {
+            Debug.Log($"[VRPhysicalWeapon] {gameObject.name} ResetWeapon is opgeroepen, maar TargetTransform is NULL of het is een Body.");
         }
     }
 
