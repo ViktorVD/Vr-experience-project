@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Events;
+using TMPro;
 
 public class VRGameManager : MonoBehaviour
 {
@@ -12,6 +13,12 @@ public class VRGameManager : MonoBehaviour
     public VRCombatAgent aiAgent;
     [Tooltip("De complete transform (bijv. de XR Rig) van de speler om te verplaatsen")]
     public Transform playerRig;
+
+    [Header("UI Elementen")]
+    [Tooltip("Het Canvas dat verborgen moet worden tijdens het gevecht")]
+    public GameObject startMenuCanvas;
+    [Tooltip("De Tekst op het canvas die zegt 'Ronde 1', 'Je Wint!', etc.")]
+    public TextMeshProUGUI statusTekst;
 
     [Header("Spawn Configuraties")]
     public Transform aiSpawnPoint;
@@ -57,6 +64,12 @@ public class VRGameManager : MonoBehaviour
         Debug.Log($"Start Ronde {huidigeRonde}");
         isBezig = true;
 
+        // 0. Verberg het menu
+        if (startMenuCanvas != null)
+        {
+            startMenuCanvas.SetActive(false);
+        }
+
         // 1. Speler respawnen
         if (playerRig != null && playerSpawnPoint != null)
         {
@@ -89,8 +102,20 @@ public class VRGameManager : MonoBehaviour
         spelerWins++;
         StopAI();
 
+        if (statusTekst != null)
+        {
+            statusTekst.text = $"Ronde {huidigeRonde} Gewonnen!\nKlik voor de volgende ronde!";
+            statusTekst.color = Color.green;
+        }
+
         OnRondeGewonnen?.Invoke();
         CheckEindeSpel();
+
+        // Laat het menu weer zien voor de volgende ronde (als het spel niet voorbij is)
+        if (huidigeRonde <= totaalRondes && startMenuCanvas != null)
+        {
+            startMenuCanvas.SetActive(true);
+        }
     }
 
     private void SpelerVerliest()
@@ -102,8 +127,20 @@ public class VRGameManager : MonoBehaviour
         aiWins++;
         StopAI();
 
+        if (statusTekst != null)
+        {
+            statusTekst.text = $"Ronde {huidigeRonde} Verloren...\nKlik voor de volgende ronde.";
+            statusTekst.color = Color.red;
+        }
+
         OnRondeVerloren?.Invoke();
         CheckEindeSpel();
+
+        // Laat het menu weer zien voor de volgende ronde (als het spel niet voorbij is)
+        if (huidigeRonde <= totaalRondes && startMenuCanvas != null)
+        {
+            startMenuCanvas.SetActive(true);
+        }
     }
 
     private void StopAI()
@@ -125,11 +162,21 @@ public class VRGameManager : MonoBehaviour
             if (spelerWins > aiWins)
             {
                 Debug.Log($"Speler wint het spel met {spelerWins}-{aiWins}!");
+                if (statusTekst != null) 
+                {
+                    statusTekst.text = $"KAMPIOEN!\nJe won met {spelerWins}-{aiWins}!";
+                    statusTekst.color = Color.yellow;
+                }
                 OnSpelGewonnen?.Invoke();
             }
             else
             {
                 Debug.Log($"AI wint het spel met {aiWins}-{spelerWins}!");
+                if (statusTekst != null) 
+                {
+                    statusTekst.text = $"GAME OVER!\nJe verloor met {aiWins}-{spelerWins}.";
+                    statusTekst.color = Color.red;
+                }
                 OnSpelVerloren?.Invoke();
             }
         }
