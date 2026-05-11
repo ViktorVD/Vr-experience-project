@@ -73,7 +73,8 @@ public class VRPhysicalWeapon : MonoBehaviour
 
         if (this.weaponType == WeaponType.Sword)
         {
-            if (!ownerAgent.isAttacking) return;
+            // AI moet 'aanvallen' om damage te doen. De speler mag altijd damage doen zolang hij zwaait.
+            if (!ownerAgent.isAttacking && !ownerAgent.isHumanPlayer) return;
 
             if (other.weaponType == WeaponType.Shield)
             {

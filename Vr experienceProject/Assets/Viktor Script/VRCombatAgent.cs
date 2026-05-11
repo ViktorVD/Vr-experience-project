@@ -14,6 +14,8 @@ public class VRCombatAgent : Agent
     public VRPhysicalWeapon physicalSword;
     public VRPhysicalWeapon physicalShield;
     public VRCombatAgent opponent;
+    [Tooltip("Vink dit AAN voor de speler, en UIT voor de AI bot!")]
+    public bool isHumanPlayer = false;
     public Rigidbody agentRb;
     public Health myHealth;
     
@@ -53,6 +55,22 @@ public class VRCombatAgent : Agent
 
     void Update()
     {
+        // Verminder cooldowns voor AI én voor Speler (zodat speler niet kan spammen)
+        if (globalActionCooldown > 0) globalActionCooldown -= Time.deltaTime;
+        if (stunTimer > 0)
+        {
+            stunTimer -= Time.deltaTime;
+            if (stunTimer <= 0) isCombatStunned = false;
+        }
+
+        if (isHumanPlayer) return; // Menselijke speler gebruikt dit script niet om te bewegen
+
+        // Als AI ver weg is, teleport hem terug
+        if (Vector3.Distance(transform.position, Vector3.zero) > 15f)
+        {
+            transform.localPosition = Vector3.zero;
+        }
+
         if (Academy.Instance.IsCommunicatorOn) return; 
         var ms = Mouse.current;
         var kb = Keyboard.current;
@@ -272,6 +290,8 @@ public class VRCombatAgent : Agent
 
     public void RegisterHitOnOpponent(float damage)
     {
+        if (isHumanPlayer && globalActionCooldown > 0) return; // Voorkom dat speler de AI instakillt door zijn zwaard stil te houden in de AI
+
         hitRegisteredThisAttack = true;
         AddReward(0.8f); 
         if (opponent.myHealth != null) 
