@@ -5,12 +5,8 @@ Het project wordt uitgevoerd door:
 - Louis Boulez  
 - Viktor Van Deun  
 
----
-
 ## Titel
 **Dualist VR – VR Duel Simulator met Adaptieve AI**
-
----
 
 ## Draaiboek (Logica van de VR-simulatie)
 
@@ -34,7 +30,6 @@ Het project wordt uitgevoerd door:
 11. Het spel verloopt in rondes en gaat door totdat één van de deelnemers 3 punten (rondes) heeft behaald.  
 12. Aan het einde krijgt de speler een eindscherm te zien dat de winnaar van de match toont en de mogelijkheid biedt om opnieuw te spelen.
 
----
 
 ## Meerwaarde van AI en het Type AI-agent
 
@@ -48,8 +43,6 @@ Door het implementeren van een **Adversarial Self-Play AI-agent** via ML-Agents,
 - Het zorgt voor een meer realistische, responsieve en menselijke uitdaging.  
 - Elke match verloopt anders, wat zorgt voor een hoge mate van variatie en replayability, resulterend in een veel boeiendere spelervaring.
 
----
-
 ## Waarom Virtual Reality?
 
 Virtual Reality voegt een cruciale laag van immersie toe die met klassieke beeldschermen niet gerealiseerd kan worden. Voor dit specifieke duel-concept is VR uitermate geschikt omdat:
@@ -59,8 +52,6 @@ Virtual Reality voegt een cruciale laag van immersie toe die met klassieke beeld
 - Het dragen en hanteren van een zwaard en schild via VR-controllers zeer natuurlijk en intuïtief aanvoelt, wat de *presence* aanzienlijk verhoogt.  
 
 Hierdoor wordt de combat-ervaring enorm intens en realistisch, een fundamentele pijler voor een geslaagde gevechtssimulatie.
-
----
 
 ## Interacties in de VR-omgeving
 
