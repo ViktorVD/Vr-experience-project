@@ -85,12 +85,13 @@ De _reward function_ is zorgvuldig gekalibreerd om gewenst gedrag te stimuleren.
   - Te dichtbij de vijand staan ('face hugging', < 0.8 meter) (-0.005).
   - Onnodig of willekeurig het schild omhoog houden (-0.001 per tick).
 
-    **(UITGEBREIDE VERSIE VAN DE REWARD FUNCTION)**
-    Aanvallen
-    Type aanval
-    Indien dezelfde type aanval als vorige aanval gebruikt wordt. - 0.02
-    Indien andere type aanval als vorige aanval gebruikt wordt. + 0.01
+**(UITGEBREIDE VERSIE VAN DE REWARD FUNCTION)**
 
+
+    Aanvallen
+        Type aanval
+            Indien dezelfde type aanval als vorige aanval gebruikt wordt. - 0.02
+            Indien andere type aanval als vorige aanval gebruikt wordt. + 0.01
             Voorkomt dat Agent dezelfde aanval blijft uitvoeren.
             Beloont agent van variatie van aanvallen te gebruiken
 
@@ -111,8 +112,9 @@ De _reward function_ is zorgvuldig gekalibreerd om gewenst gedrag te stimuleren.
             Beloont agent om zijn tegenstanders hp naar 0 te verminderen.
 
     Blokkeren
-    Actie blokkeren
-    Indien agent blokkeert - 0.001
+
+        Actie blokkeren
+            Indien agent blokkeert - 0.001
 
             Voorkomt agent willekeurig gaat blokkeren
 
@@ -137,8 +139,9 @@ De _reward function_ is zorgvuldig gekalibreerd om gewenst gedrag te stimuleren.
             Beloont agent voor aanvallen te ontwijken aan de hand van beweging.
 
     Rotatie
-    Richting tegenstander
-    Indien agent in een hoek van 30° naar tegenstander kijkt + 0.005
+    
+        Richting tegenstander
+            Indien agent in een hoek van 30° naar tegenstander kijkt + 0.005
 
             Beloont agent door richting tegenstander te kijken.
 
