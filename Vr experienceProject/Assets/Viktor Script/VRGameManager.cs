@@ -31,6 +31,17 @@ public class VRGameManager : MonoBehaviour
     private int aiWins = 0;
     private bool isBezig = false;
 
+    [Header("Audio")]
+    public AudioSource gameAudioSource;
+    [Tooltip("Apart AudioSource voor achtergrondmuziek (Zet Play On Awake uit!)")]
+    public AudioSource bgmAudioSource;
+    public AudioClip battleMusic;
+    public AudioClip startRondeSound;
+    public AudioClip winRondeSound;
+    public AudioClip loseRondeSound;
+    public AudioClip winGameSound;
+    public AudioClip loseGameSound;
+
     [Header("Events (Koppel aan UI of geluiden)")]
     public UnityEvent OnSpelGestart;
     public UnityEvent OnRondeGewonnen;
@@ -57,7 +68,8 @@ public class VRGameManager : MonoBehaviour
     {
         if (huidigeRonde > totaalRondes)
         {
-            Debug.Log("Alle rondes zijn al gespeeld! Roep ResetSpel() aan om opnieuw te beginnen.");
+            // Als het spel al gedaan is en de speler klikt opnieuw op start, begin dan helemaal opnieuw!
+            ResetSpel();
             return;
         }
 
@@ -90,6 +102,16 @@ public class VRGameManager : MonoBehaviour
         }
         if (aiHealth != null) aiHealth.ResetHealth();
 
+        if (gameAudioSource != null && startRondeSound != null) gameAudioSource.PlayOneShot(startRondeSound);
+        
+        // Start de battle music
+        if (bgmAudioSource != null && battleMusic != null && !bgmAudioSource.isPlaying)
+        {
+            bgmAudioSource.clip = battleMusic;
+            bgmAudioSource.loop = true;
+            bgmAudioSource.Play();
+        }
+
         OnSpelGestart?.Invoke();
     }
 
@@ -108,13 +130,17 @@ public class VRGameManager : MonoBehaviour
             statusTekst.color = Color.green;
         }
 
+        if (gameAudioSource != null && winRondeSound != null) gameAudioSource.PlayOneShot(winRondeSound);
+
         OnRondeGewonnen?.Invoke();
         CheckEindeSpel();
 
-        // Laat het menu weer zien voor de volgende ronde (als het spel niet voorbij is)
-        if (huidigeRonde <= totaalRondes && startMenuCanvas != null)
+        // Laat het menu weer zien zodat de speler kan klikken (ook na de laatste ronde)
+        if (startMenuCanvas != null)
         {
             startMenuCanvas.SetActive(true);
+            // Stop de muziek tussen de rondes in
+            if (bgmAudioSource != null) bgmAudioSource.Stop();
         }
     }
 
@@ -133,13 +159,17 @@ public class VRGameManager : MonoBehaviour
             statusTekst.color = Color.red;
         }
 
+        if (gameAudioSource != null && loseRondeSound != null) gameAudioSource.PlayOneShot(loseRondeSound);
+
         OnRondeVerloren?.Invoke();
         CheckEindeSpel();
 
-        // Laat het menu weer zien voor de volgende ronde (als het spel niet voorbij is)
-        if (huidigeRonde <= totaalRondes && startMenuCanvas != null)
+        // Laat het menu weer zien zodat de speler kan klikken (ook na de laatste ronde)
+        if (startMenuCanvas != null)
         {
             startMenuCanvas.SetActive(true);
+            // Stop de muziek tussen de rondes in
+            if (bgmAudioSource != null) bgmAudioSource.Stop();
         }
     }
 
@@ -167,6 +197,10 @@ public class VRGameManager : MonoBehaviour
                     statusTekst.text = $"KAMPIOEN!\nJe won met {spelerWins}-{aiWins}!";
                     statusTekst.color = Color.yellow;
                 }
+                
+                if (gameAudioSource != null && winGameSound != null) gameAudioSource.PlayOneShot(winGameSound);
+                if (bgmAudioSource != null) bgmAudioSource.Stop();
+                
                 OnSpelGewonnen?.Invoke();
             }
             else
@@ -177,6 +211,10 @@ public class VRGameManager : MonoBehaviour
                     statusTekst.text = $"GAME OVER!\nJe verloor met {aiWins}-{spelerWins}.";
                     statusTekst.color = Color.red;
                 }
+                
+                if (gameAudioSource != null && loseGameSound != null) gameAudioSource.PlayOneShot(loseGameSound);
+                if (bgmAudioSource != null) bgmAudioSource.Stop();
+                
                 OnSpelVerloren?.Invoke();
             }
         }

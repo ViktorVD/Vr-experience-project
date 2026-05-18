@@ -9,6 +9,15 @@ public class VRPhysicalWeapon : MonoBehaviour
     public Transform targetTransform;
     public VRCombatAgent ownerAgent;
 
+    [Header("VR Offset (Pas dit aan om het zwaard te fixen!)")]
+    public Vector3 positionOffset = Vector3.zero;
+    public Vector3 rotationOffset = Vector3.zero;
+
+    [Header("Audio")]
+    public AudioSource weaponAudioSource;
+    public AudioClip blockSound;
+    public AudioClip hitSound;
+
     private void Start()
     {
         Rigidbody rb = GetComponent<Rigidbody>();
@@ -44,8 +53,8 @@ public class VRPhysicalWeapon : MonoBehaviour
     {
         if (targetTransform != null && (weaponType == WeaponType.Sword || weaponType == WeaponType.Shield))
         {
-            transform.position = targetTransform.position;
-            transform.rotation = targetTransform.rotation;
+            transform.position = targetTransform.TransformPoint(positionOffset);
+            transform.rotation = targetTransform.rotation * Quaternion.Euler(rotationOffset);
             Debug.Log($"[VRPhysicalWeapon] {gameObject.name} ResetWeapon gehaald naar: {targetTransform.name}");
         }
         else
@@ -59,8 +68,8 @@ public class VRPhysicalWeapon : MonoBehaviour
         // Alleen wapens volgen hun target via transform
         if (targetTransform != null && (weaponType == WeaponType.Sword || weaponType == WeaponType.Shield))
         {
-            transform.position = targetTransform.position;
-            transform.rotation = targetTransform.rotation;
+            transform.position = targetTransform.TransformPoint(positionOffset);
+            transform.rotation = targetTransform.rotation * Quaternion.Euler(rotationOffset);
         }
     }
 
@@ -82,12 +91,19 @@ public class VRPhysicalWeapon : MonoBehaviour
                 ownerAgent.AddReward(-0.2f);
                 other.ownerAgent.AddReward(0.3f);
                 ownerAgent.ApplyCombatStun(0.8f); 
+                
+                // Play sound if assigned to the Sword
+                if (weaponAudioSource != null && blockSound != null) weaponAudioSource.PlayOneShot(blockSound);
+                // Play sound if assigned to the Shield instead!
+                if (other.weaponAudioSource != null && other.blockSound != null) other.weaponAudioSource.PlayOneShot(other.blockSound);
             }
             else if (other.weaponType == WeaponType.Body)
             {
                 Debug.Log("HIT BODY!");
                 ownerAgent.RegisterHitOnOpponent(25f);
                 other.ownerAgent.AddReward(-0.2f);
+                
+                if (weaponAudioSource != null && hitSound != null) weaponAudioSource.PlayOneShot(hitSound);
             }
         }
     }

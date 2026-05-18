@@ -25,6 +25,10 @@ public class VRCombatAgent : Agent
     public Rigidbody agentRb;
     public Health myHealth;
     
+    [Header("Audio")]
+    public AudioSource audioSource;
+    public AudioClip attackSound;
+    
     [Header("Settings")]
     public float moveSpeed = 2.2f;
     public bool isAttacking = false;
@@ -227,6 +231,10 @@ public class VRCombatAgent : Agent
                     if (agentAnimator != null)
                     {
                         agentAnimator.SetTrigger("Attack");
+                    }
+                    if (audioSource != null && attackSound != null)
+                    {
+                        audioSource.PlayOneShot(attackSound);
                     }
                 }
             }
