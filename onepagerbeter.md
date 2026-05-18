@@ -1,84 +1,73 @@
-# Dualist VR  – VR Duel Simulator met Adaptieve AI
+# Dualist VR – VR Duel Simulator met Adaptieve AI
 
 ## Team
 Het project wordt uitgevoerd door:
 - Louis Boulez  
 - Viktor Van Deun  
+
 ---
 
 ## Titel
-**Gladiator – VR Duel Simulator met Adaptieve AI**
+**Dualist VR – VR Duel Simulator met Adaptieve AI**
 
 ---
 
-## Draaiboek (logica van de VR-simulatie)
+## Draaiboek (Logica van de VR-simulatie)
 
-1. De speler start de applicatie en klikt op de startknop.  
-2. De speler wordt in een virtuele arena geplaatst, samen met een AI-gestuurde tegenstander.  
-3. De speler krijgt controle over een zwaard en een schild en kan vrij bewegen binnen de arena.  
-
-4. De speler kan verschillende acties uitvoeren:
-   - Aanvallen met het zwaard  
-   - Verdedigen met het schild  
-   - Zich positioneren door rond te bewegen  
-
-5. De AI-tegenstander observeert continu:
-   - De positie van de speler  
-   - De bewegingen van het zwaard en schild  
-   - De afstand tussen speler en AI  
-
-6. Op basis van deze informatie kiest de AI in real time zijn acties (aanval, verdediging, positionering).  
-
-7. De speler en de AI herhalen deze interacties voortdurend tijdens het gevecht.  
-
-8. Wanneer een speler of de AI geraakt wordt:
-   - Verliest de getroffen partij een aantal hit points (HP)  
-
-9. Het gevecht gaat door totdat de HP van één van beide spelers 0 bereikt.  
-
-10. De winnaar van de ronde krijgt 1 punt.  
-
-11. Het spel loopt door totdat één van de spelers 3 punten heeft behaald.  
-
-12. De speler krijgt een eindscherm te zien met de winnaar.
+1. De speler start de applicatie en klikt op de startknop om het spel te beginnen.  
+2. De speler wordt gespawned in een virtuele arena, oog in oog met een AI-gestuurde gladiator.  
+3. De speler wordt uitgerust met een zwaard en een schild en heeft de mogelijkheid om zich vrij (fysiek of via de controller) binnen de arena te verplaatsen.  
+4. De speler kan diverse acties ondernemen:
+   - Aanvallen uitvoeren met het zwaard (snijden of steken)  
+   - Zichzelf verdedigen door inkomende slagen te blokkeren met het schild  
+   - Strategisch positioneren door in de arena te bewegen en aanvallen te ontwijken  
+5. De AI-tegenstander observeert continu de speelomgeving:
+   - De exacte positie en rotatie van de speler  
+   - De bewegingen en posities van het zwaard en het schild van de speler  
+   - De relatieve afstand tussen speler en AI  
+6. Op basis van deze real-time waarnemingen selecteert de AI via zijn neuraal netwerk de meest optimale acties (aanvallen, verdedigen of herpositioneren).  
+7. De speler en de AI interageren continu tijdens het gevecht.  
+8. Zodra een speler of de AI succesvol geraakt wordt:
+   - Verliest de getroffen partij een vooraf bepaald aantal hit points (HP).  
+9. Het gevecht of de ronde gaat door totdat de HP van één van de deelnemers tot 0 of lager zakt.  
+10. De winnaar van de betreffende ronde ontvangt 1 punt.  
+11. Het spel verloopt in rondes en gaat door totdat één van de deelnemers 3 punten (rondes) heeft behaald.  
+12. Aan het einde krijgt de speler een eindscherm te zien dat de winnaar van de match toont en de mogelijkheid biedt om opnieuw te spelen.
 
 ---
 
-## Meerwaarde van AI + type AI-agent
+## Meerwaarde van AI en het Type AI-agent
 
-Zonder AI zou de tegenstander gebaseerd zijn op vaste regels of scripts. Dit zou ervoor zorgen dat:
-- De tegenstander voorspelbaar wordt  
-- De speler snel een patroon kan herkennen en altijd kan winnen  
-- Of net dat de tegenstander “perfect” speelt en onmogelijk te verslaan is  
+Wanneer de tegenstander geprogrammeerd zou zijn op basis van vaste regels of scripts (bv. Finite State Machines), zou dit leiden tot de volgende nadelen:
+- De tegenstander wordt na verloop van tijd voorspelbaar.  
+- De speler zal snel de vaste patronen herkennen, waardoor de uitdaging verdwijnt.  
+- Als de scripts te perfect zijn, wordt de tegenstander oneerlijk en frustrerend om tegen te spelen.
 
-Door gebruik te maken van een **Adversarial Self-Play AI-agent**, leert de AI door tegen zichzelf te spelen. Hierdoor:
-- Ontwikkelt de AI steeds betere strategieën  
-- Ontstaat een meer realistische en uitdagende tegenstander  
-
-Dit zorgt voor een gevarieerde en boeiende spelervaring waarbij elke match anders verloopt.
+Door het implementeren van een **Adversarial Self-Play AI-agent** via ML-Agents, leert de AI door herhaaldelijk tegen zichzelf en willekeurige policies te spelen. Dit resulteert in een aantal belangrijke voordelen:
+- De AI ontwikkelt dynamische en steeds beter wordende strategieën op basis van trial en error (Reinforcement Learning).  
+- Het zorgt voor een meer realistische, responsieve en menselijke uitdaging.  
+- Elke match verloopt anders, wat zorgt voor een hoge mate van variatie en replayability, resulterend in een veel boeiendere spelervaring.
 
 ---
 
-## Waarom VR?
+## Waarom Virtual Reality?
 
-Virtual Reality voegt een extra laag van immersie toe die niet mogelijk is op een klassiek scherm. In deze simulatie is VR bijzonder geschikt omdat:
+Virtual Reality voegt een cruciale laag van immersie toe die met klassieke beeldschermen niet gerealiseerd kan worden. Voor dit specifieke duel-concept is VR uitermate geschikt omdat:
+- De speler fysiek aanwezig is en de schaal van de arena en de tegenstander kan inschatten.  
+- Reacties en gevechtsbewegingen gebaseerd zijn op werkelijke fysieke handelingen (1-op-1 mapping van de armen) in plaats van abstracte knoppencombinaties.  
+- De speler actief zijn hoofd en lichaam moet gebruiken om de acties van de tegenstander in het oog te houden, in te schatten en te ontwijken.  
+- Het dragen en hanteren van een zwaard en schild via VR-controllers zeer natuurlijk en intuïtief aanvoelt, wat de *presence* aanzienlijk verhoogt.  
 
-- De speler zich fysiek in de arena bevindt  
-- Reacties gebaseerd zijn op echte bewegingen (niet enkel knoppen)  
-- De speler actief moet kijken naar de tegenstander om diens acties te voorspellen  
-- Het gebruik van een zwaard en schild natuurlijker aanvoelt via VR-controllers  
-
-Hierdoor wordt de ervaring intenser en realistischer, wat belangrijk is voor een gevechtssimulatie.
+Hierdoor wordt de combat-ervaring enorm intens en realistisch, een fundamentele pijler voor een geslaagde gevechtssimulatie.
 
 ---
 
 ## Interacties in de VR-omgeving
 
-De interactie in het spel is voornamelijk fysiek en gebeurt via VR-controllers:
+De kern-interacties binnen het spel zijn uiterst fysiek en gebeuren via motion controls:
+- **Aanvallen**: De speler hanteert het zwaard met één hand en voert fysieke zwaaibewegingen uit om schade toe te brengen.  
+- **Verdedigen**: De speler gebruikt het schild in de andere hand en positioneert dit fysiek in de baan van een inkomende aanval om deze te pareren.  
+- **Navigatie**: De speler kan rondlopen met de thumbsticks (of via room-scale VR fysiek stappen) om afstand te creëren of de kloof te dichten.  
+- **Tactiek**: De speler moet actief richten, de acties van de AI analyseren, openingen in de verdediging spotten en zijn eigen slagen perfect timen.
 
-- De speler kan een zwaard vasthouden en gebruiken om aan te vallen  
-- De speler kan een schild gebruiken om aanvallen te blokkeren  
-- De speler kan vrij bewegen binnen de arena  
-- De speler moet actief richten en timen om de tegenstander te raken  
-
-De combinatie van aanval, verdediging en positionering zorgt voor een interactieve en dynamische gameplay waarin de speler constant beslissingen moet nemen.
+Deze combinatie van aanval, verdediging en ruimtelijke positionering staat garant voor interactieve en dynamische gameplay waarbij reflexen en constante besluitvorming centraal staan.

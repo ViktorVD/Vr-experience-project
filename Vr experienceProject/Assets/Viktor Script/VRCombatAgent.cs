@@ -113,8 +113,12 @@ public class VRCombatAgent : Agent
         currentBlockDir = 0;
         animTimer = 0f;
         
-        swordTarget.localPosition = swordIdlePos + new Vector3(0, weaponHeightOffset, 0);
-        shieldTarget.localPosition = shieldIdlePos + new Vector3(0, weaponHeightOffset, 0);
+        if (!isHumanPlayer)
+        {
+            swordTarget.localPosition = swordIdlePos + new Vector3(0, weaponHeightOffset, 0);
+            shieldTarget.localPosition = shieldIdlePos + new Vector3(0, weaponHeightOffset, 0);
+        }
+        
         physicalSword.ResetWeapon();
         physicalShield.ResetWeapon();
         if(myHealth != null) myHealth.ResetHealth();
@@ -200,16 +204,19 @@ public class VRCombatAgent : Agent
             currentBlockDir = blockIdx;
             isBlocking = (blockIdx > 0);
             
-            Vector3 blockPos = shieldIdlePos;
-            if (blockIdx == 1) blockPos = new Vector3(0f, 1.2f, 0.7f); 
-            else if (blockIdx == 2) blockPos = new Vector3(-0.6f, 1.2f, 0.6f); 
-            else if (blockIdx == 3) blockPos = new Vector3(0.6f, 1.2f, 0.6f); 
-            
-            if (isBlocking) {
-                AddReward(-0.001f);
-                shieldTarget.localPosition = Vector3.MoveTowards(shieldTarget.localPosition, blockPos + new Vector3(0, weaponHeightOffset, 0), Time.fixedDeltaTime * 15f);
-            } else {
-                shieldTarget.localPosition = Vector3.MoveTowards(shieldTarget.localPosition, shieldIdlePos + new Vector3(0, weaponHeightOffset, 0), Time.fixedDeltaTime * 20f);
+            if (!isHumanPlayer)
+            {
+                Vector3 blockPos = shieldIdlePos;
+                if (blockIdx == 1) blockPos = new Vector3(0f, 1.2f, 0.7f); 
+                else if (blockIdx == 2) blockPos = new Vector3(-0.6f, 1.2f, 0.6f); 
+                else if (blockIdx == 3) blockPos = new Vector3(0.6f, 1.2f, 0.6f); 
+                
+                if (isBlocking) {
+                    AddReward(-0.001f);
+                    shieldTarget.localPosition = Vector3.MoveTowards(shieldTarget.localPosition, blockPos + new Vector3(0, weaponHeightOffset, 0), Time.fixedDeltaTime * 15f);
+                } else {
+                    shieldTarget.localPosition = Vector3.MoveTowards(shieldTarget.localPosition, shieldIdlePos + new Vector3(0, weaponHeightOffset, 0), Time.fixedDeltaTime * 20f);
+                }
             }
 
             // 3. AANVALLEN (Alleen als we NIET blokkeren)
@@ -245,7 +252,10 @@ public class VRCombatAgent : Agent
             if (!isAttacking) {
                 isBlocking = false;
                 currentBlockDir = 0;
-                shieldTarget.localPosition = Vector3.MoveTowards(shieldTarget.localPosition, shieldIdlePos + new Vector3(0, weaponHeightOffset, 0), Time.fixedDeltaTime * 20f);
+                if (!isHumanPlayer)
+                {
+                    shieldTarget.localPosition = Vector3.MoveTowards(shieldTarget.localPosition, shieldIdlePos + new Vector3(0, weaponHeightOffset, 0), Time.fixedDeltaTime * 20f);
+                }
             }
         }
 
@@ -285,6 +295,8 @@ public class VRCombatAgent : Agent
 
     void UpdateTacticalAnimations()
     {
+        if (isHumanPlayer) return; // Menselijke speler gebruikt zijn ECHTE handen! AI hoeft dit niet aan te passen.
+
         if (!isAttacking)
         {
             swordTarget.localPosition = Vector3.MoveTowards(swordTarget.localPosition, swordIdlePos + new Vector3(0, weaponHeightOffset, 0), Time.fixedDeltaTime * 20f);

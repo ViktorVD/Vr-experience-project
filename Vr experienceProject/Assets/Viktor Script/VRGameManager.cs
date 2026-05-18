@@ -51,6 +51,29 @@ public class VRGameManager : MonoBehaviour
 
     void Start()
     {
+        // 1. Zorg dat de AudioSources bestaan en op 2D staan (zodat je ze overal hoort in VR)
+        if (gameAudioSource == null)
+        {
+            gameAudioSource = gameObject.AddComponent<AudioSource>();
+            Debug.LogWarning("Geen gameAudioSource toegewezen, automatisch één toegevoegd op de GameManager.");
+        }
+        gameAudioSource.spatialBlend = 0f; // Forceer 2D geluid!
+
+        if (bgmAudioSource == null)
+        {
+            bgmAudioSource = gameObject.AddComponent<AudioSource>();
+            Debug.LogWarning("Geen bgmAudioSource toegewezen, automatisch één toegevoegd op de GameManager.");
+        }
+        
+        // CRUCIAL FIX: Als ze naar dezelfde AudioSource wijzen, stopt de achtergrondmuziek de win-geluiden!
+        if (gameAudioSource == bgmAudioSource)
+        {
+            Debug.LogWarning("Let op: gameAudioSource en bgmAudioSource delen dezelfde AudioSource. Hierdoor werden geluiden afgekapt! Dit is nu gefixt.");
+            bgmAudioSource = gameObject.AddComponent<AudioSource>();
+        }
+        
+        bgmAudioSource.spatialBlend = 0f; // Forceer 2D geluid!
+
         // Koppel de health events vast aan de functies
         if (playerHealth != null)
             playerHealth.OnDeath.AddListener(SpelerVerliest);
@@ -105,11 +128,21 @@ public class VRGameManager : MonoBehaviour
         if (gameAudioSource != null && startRondeSound != null) gameAudioSource.PlayOneShot(startRondeSound);
         
         // Start de battle music
-        if (bgmAudioSource != null && battleMusic != null && !bgmAudioSource.isPlaying)
+        if (bgmAudioSource != null)
         {
-            bgmAudioSource.clip = battleMusic;
-            bgmAudioSource.loop = true;
-            bgmAudioSource.Play();
+            if (battleMusic == null)
+            {
+                Debug.LogWarning("Battle Music kan niet spelen: Er is geen AudioClip toegewezen in het 'Battle Music' vakje van de VRGameManager!");
+            }
+            else 
+            {
+                Debug.Log("Achtergrondmuziek wordt nu gestart (geforceerd)!");
+                bgmAudioSource.Stop(); // Forceer een herstart
+                bgmAudioSource.clip = battleMusic;
+                bgmAudioSource.loop = true;
+                bgmAudioSource.volume = 0.7f; // Zet volume expliciet op 100%
+                bgmAudioSource.Play();
+            }
         }
 
         OnSpelGestart?.Invoke();
@@ -130,7 +163,15 @@ public class VRGameManager : MonoBehaviour
             statusTekst.color = Color.green;
         }
 
-        if (gameAudioSource != null && winRondeSound != null) gameAudioSource.PlayOneShot(winRondeSound);
+        if (gameAudioSource != null)
+        {
+            if (winRondeSound != null)
+            {
+                Debug.Log("Speel winRondeSound af!");
+                gameAudioSource.PlayOneShot(winRondeSound);
+            }
+            else Debug.LogWarning("Win Ronde Sound kan niet spelen: Geen AudioClip toegewezen!");
+        }
 
         OnRondeGewonnen?.Invoke();
         CheckEindeSpel();
@@ -159,7 +200,15 @@ public class VRGameManager : MonoBehaviour
             statusTekst.color = Color.red;
         }
 
-        if (gameAudioSource != null && loseRondeSound != null) gameAudioSource.PlayOneShot(loseRondeSound);
+        if (gameAudioSource != null)
+        {
+            if (loseRondeSound != null)
+            {
+                Debug.Log("Speel loseRondeSound af!");
+                gameAudioSource.PlayOneShot(loseRondeSound);
+            }
+            else Debug.LogWarning("Lose Ronde Sound kan niet spelen: Geen AudioClip toegewezen!");
+        }
 
         OnRondeVerloren?.Invoke();
         CheckEindeSpel();
