@@ -7,7 +7,6 @@ In dit project werd een functionele VR-simulatie ontwikkeld waarbij een menselij
 
 Deze tutorial dient als uitgebreide gids om ons project vanaf de basis te reproduceren. Tegen het einde van dit document zal de lezer inzicht hebben verworven in de benodigde softwarepakketten en configuraties, het gedrag en de structuur van de virtuele omgeving, en de specifieke observaties, acties en beloningen die cruciaal zijn voor het effectief trainen van de vechtende AI-agent. Tevens worden de trainingsresultaten geanalyseerd.
 
-
 ## 2. Methoden
 
 ### 2.1. Installatie en Benodigdheden
@@ -24,7 +23,6 @@ Daarnaast zijn de volgende gratis Unity Asset Store pakketten geïmporteerd:
 
 - [Low Poly 3D Wooden Shield Pack](https://assetstore.unity.com/packages/p/low-poly-3d-wooden-shield-pack-359602)
 - [Free Low Poly Swords - RPG Weapons](https://assetstore.unity.com/packages/p/free-low-poly-swords-rpg-weapons-198166)
-- Arena omgeving (Eigen implementatie / Standaard primitive objecten)
 
 ### 2.2. Verloop van de Simulatie
 
@@ -66,23 +64,83 @@ De agent maakt gebruik van Discrete Actions over meerdere branches:
 
 #### Beloningen (Rewards & Penalties)
 
-De _reward function_ is zorgvuldig gekalibreerd om gewenst gedrag te stimuleren:
+De _reward function_ is zorgvuldig gekalibreerd om gewenst gedrag te stimuleren. Tijdens het ontwikkelen zijn er nog enkele nieuwe beloningen toegevoegd (zoals penalty's voor geblokkeerd worden) om de AI slimmer te maken:
 
 - **Positieve Beloningen (+)**:
-  - Een succesvolle treffer met het zwaard (+0.8).
-  - De hitpoints van de tegenstander reduceren tot nul (+1.0).
-  - Voldoende afstand bewaren om tactisch overzicht te houden (+0.01).
+  - Een succesvolle treffer op het lichaam van de vijand (+0.8).
+  - De vijand uitschakelen (HP gereduceerd tot nul) (+1.0).
+  - Succesvol een inkomende aanval pareren met het schild (+0.3).
+  - De ideale afstand ('sweet spot') bewaren (tussen 1.2 en 2.3 meter) (+0.004 per tick).
   - Afwisselen van aanvalstypes ter bevordering van variatie (+0.01).
-  - Ontwijken van inkomende aanvallen door naar achteren te stappen (+0.005).
-  - Continu naar de tegenstander gericht blijven (+0.005).
+  - Tactisch ontwijken door naar achteren te stappen terwijl de vijand aanvalt (+0.005).
+  - Continu correct naar de tegenstander gericht blijven (+0.005 per tick).
+
 - **Negatieve Straffen (-)**:
   - Eigen HP gereduceerd tot nul (-1.0).
-  - Falende aanvallen (aanvallen die missen) om spammen te voorkomen (-0.02).
-  - Dezelfde aanval constant herhalen (-0.02).
-  - Onnodig of willekeurig blokkeren (-0.001).
-  - Te dicht ('face hugging') of een ongunstige afstand ten opzichte van de vijand (-0.005 / -0.004).
+  - Een inkomende zwaardslag incasseren op het eigen lichaam (-0.2).
+  - Jouw aanval wordt geblokkeerd door het schild van de tegenstander (-0.2).
+  - Falende aanvallen (in de lucht zwaaien/missen) om spammen te voorkomen (-0.02).
+  - Exact dezelfde aanval direct opnieuw uitvoeren (-0.02).
+  - Te ver weglopen van het gevecht (> 6 meter afstand) (-0.01).
+  - Te dichtbij de vijand staan ('face hugging', < 0.8 meter) (-0.005).
+  - Onnodig of willekeurig het schild omhoog houden (-0.001 per tick).
 
+    **(UITGEBREIDE VERSIE VAN DE REWARD FUNCTION)**
+    Aanvallen
+    Type aanval
+    Indien dezelfde type aanval als vorige aanval gebruikt wordt. - 0.02
+    Indien andere type aanval als vorige aanval gebruikt wordt. + 0.01
 
+            Voorkomt dat Agent dezelfde aanval blijft uitvoeren.
+            Beloont agent van variatie van aanvallen te gebruiken
+
+        Succesvolle aanval
+            Indien de aanval werd uitgevoerd maar de tegenstander niet heeft geraakt.
+                - 0.02
+            Indien de aanval werd uitgevoerd en de tegenstander heeft geraakt.
+                + 0.8
+            Voorkomt dat agent aanvallen uitvoert wanneer hij weinig tot 0 kans heeft op raken.
+            Beloont agent agent voor aanvallen uitvoeren die succesvol zijn
+        Healthpoints
+            Indien agent hp tot 0 (of kleiner) wordt verminderd.
+                - 1.0
+            Indien tegenstander hp tot 0 (of kleiner) wordt verminderd.
+                + 1.0
+
+            Voorkomt dat agent te roekeloos speelt.
+            Beloont agent om zijn tegenstanders hp naar 0 te verminderen.
+
+    Blokkeren
+    Actie blokkeren
+    Indien agent blokkeert - 0.001
+
+            Voorkomt agent willekeurig gaat blokkeren
+
+    Beweging
+
+        Afstand tegenstander
+            Indien te dicht bij tegenstander.
+                - 0.005
+            Indien te ver van tegenstander.
+                + 0.01
+            Indien correcte afstand van tegenstander
+                - 0.004
+
+            Voorkomt "face hugging" : agent gaat tegenstander "plakken".
+            Voorkomt weglopen
+            Beloont agent van zinvolle afstand tussen spelers.
+
+        Ontwijken
+            Indien tegenstander aanvalt en agent naar achter loopt/moveIdx == 2
+                + 0.005
+
+            Beloont agent voor aanvallen te ontwijken aan de hand van beweging.
+
+    Rotatie
+    Richting tegenstander
+    Indien agent in een hoek van 30° naar tegenstander kijkt + 0.005
+
+            Beloont agent door richting tegenstander te kijken.
 
 ## 3. Resultaten
 
@@ -103,7 +161,6 @@ Een opvallende waarneming tijdens de trainingsfase was dat de _Losses_ (Grafiek 
 ## 4. Conclusie
 
 In dit project is met succes een adaptieve AI-gladiator gerealiseerd voor een VR-gevechtssimulator, die door middel van reinforcement learning zelfstandig gevechtstactieken heeft aangeleerd. De uiteindelijke AI-agent toont competitief gedrag, kan inkomende slagen blokkeren en past een gevarieerd aanvalsarsenaal toe. Persoonlijk beschouwen wij het bereikte resultaat als een sterke demonstratie van de meerwaarde van zelflerende agenten ten opzichte van klassiek geprogrammeerde vijanden in interactieve VR-games; het levert een veel natuurlijkere en onvoorspelbaardere ervaring op. Voor de toekomst zouden we het project nog willen verbeteren door het toevoegen van meer geavanceerde Inverse Kinematics (IK) voor vloeiendere arm-animaties van de AI, en het trainen van meerdere agent-persoonlijkheden (bijv. agressief versus defensief).
-
 
 ## 5. Bronvermelding
 
